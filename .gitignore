@@ -4,3 +4,7 @@ target/
 .idea
 lowered.hnir
 .bsp
+.bloop
+.metals
+metals.sbt
+nativelib/*

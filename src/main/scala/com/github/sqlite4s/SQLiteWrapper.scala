@@ -92,7 +92,7 @@ object SQLiteWrapper {
 
     val errMsgPtr: Ptr[CString] = stackalloc[CString]()
 
-    val rc = Zone { implicit z: Zone =>
+    val rc = Zone.acquire { implicit z: Zone =>
 
       // Note: we use the Charset "UTF-8" to get sql in correct UTF-8
       val utf8Sql = CUtils.toCString(sql, UTF8_CHARSET)
@@ -175,7 +175,7 @@ object SQLiteWrapper {
     val pPrimaryKey: Ptr[CInt] = stackalloc[CInt]()
     val pAutoinc: Ptr[CInt] = stackalloc[CInt]()
 
-    var rc = Zone { implicit z: Zone =>
+    var rc = Zone.acquire { implicit z: Zone =>
       sqlite.sqlite3_table_column_metadata(
         db,
         if (dbName == null) null else CUtils.toCString(dbName),
@@ -225,7 +225,7 @@ object SQLiteWrapper {
   }
 
   def sqlite3BindText(stmt: SQLiteStatement.Handle, index: Int, value: String): Int = {
-    Zone { implicit z =>
+    Zone.acquire { implicit z =>
       _sqlite3BindText(stmt, index, value, SQLITE_TRANSIENT)
     }
   }
@@ -396,7 +396,7 @@ object SQLiteWrapper {
     else {
       val longPtr = ptr.asInstanceOf[Ptr[CLong]]
 
-      longPtr.update(1,longPtr(1) + 1L)
+      longPtr.update(1, (longPtr(1) + 1L).toSize)
       if (longPtr(0) != 0) -1 else 0
     }
   })
@@ -461,7 +461,7 @@ class SQLiteWrapper {
 
     val dbPtr = stackalloc[Ptr[sqlite.sqlite3]]()
 
-    val rc = Zone { implicit z: Zone =>
+    val rc = Zone.acquire { implicit z: Zone =>
       // Note: we use the Charset "UTF-8" to get filename in correct UTF-8
       val utf8Str = CUtils.toCString(filename, SQLiteWrapper.UTF8_CHARSET)(z)
       sqlite.sqlite3_open_v2(utf8Str, dbPtr, flags, null)
@@ -565,7 +565,7 @@ class SQLiteWrapper {
 
     val stmtPtr = stackalloc[Ptr[sqlite.sqlite3_stmt]]()
 
-    val rc = Zone { implicit z: Zone =>
+    val rc = Zone.acquire { implicit z: Zone =>
       // Note (https://sqlite.org/capi3ref.html#sqlite3_prepare):
       // If the caller knows that the supplied string is nul-terminated,
       // then there is a small performance advantage to passing an nByte parameter
@@ -709,7 +709,7 @@ class SQLiteWrapper {
 
     myLastReturnCode = rc
 
-    PtrBox(value, length.toULong )
+    PtrBox(value, length.toCSize)
   }
 
   /*
@@ -760,7 +760,7 @@ class SQLiteWrapper {
 
     val blobPtr = stackalloc[Ptr[sqlite.sqlite3_blob]]()
 
-    val rc = Zone { implicit z: Zone =>
+    val rc = Zone.acquire { implicit z: Zone =>
       sqlite.sqlite3_blob_open(
         db,
         CUtils.toCString(dbname),

@@ -1,26 +1,35 @@
 name := "sqlite4s"
 organization := "com.github.david-bouyssie"
-version := "0.5.0"
-scalaVersion := "2.13.8"
-crossScalaVersions := Seq("3.1.2", "2.13.8", "2.12.15", "2.11.12")
+version := "1.0.0"
+scalaVersion := "3.3.3"
+crossScalaVersions := Seq("3.2.0", "3.1.2", "2.13.8", "2.12.14")
 
-libraryDependencies += "com.outr" %%% "scribe" % (if (scalaVersion.value.startsWith("2.11.")) "3.6.2" else "3.8.2")
-libraryDependencies += "com.lihaoyi" %%% "utest" % "0.7.11" % Test
+enablePlugins(ScalaNativePlugin)
+
+// import to add Scala Native options
+import scala.scalanative.build._
+
+val linkingOptions = Seq(
+      "-L", file(".").getAbsolutePath ++ "/nativelib"
+) 
+
+// defaults set with common options shown
+nativeConfig ~= { c =>
+  c.withLTO(LTO.none) // thin
+    .withMode(Mode.releaseFast) // releaseFast
+    .withGC(GC.commix) // commix
+    .withLinkStubs(true)
+    .withLinkingOptions(linkingOptions)
+}
+
+libraryDependencies ++= List(
+    "com.outr" %%% "scribe" % "3.14.0",
+    "com.lihaoyi" %%% "utest" % "0.8.3" % Test
+  )
 
 testFrameworks += new TestFramework("utest.runner.Framework")
 // Disable parallel execution of tests (as they need to be launched independently)
 Test / parallelExecution := false
-
-enablePlugins(ScalaNativePlugin)
-
-// Set to false or remove if you want to show stubs as linking errors
-nativeLinkStubs := true
-
-nativeMode := "debug" //"release-fast"
-nativeLTO := "none" //"none" //"thin"
-nativeLinkingOptions ++= Seq(
-  "-L" ++ baseDirectory.value.getAbsolutePath() ++ "/nativelib"
-)
 
 // Your profile name of the sonatype account. The default is the same with the organization value
 //sonatypeProfileName := "david-bouyssie"

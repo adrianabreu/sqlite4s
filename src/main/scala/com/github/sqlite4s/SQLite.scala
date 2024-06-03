@@ -104,7 +104,7 @@ object SQLite {
     * @see <a href="http://www.sqlite.org/c3ref/complete.html">sqlite3_complete</a>
     */
   def isComplete(sql: String): Boolean = {
-    Zone { implicit z =>
+    Zone.acquire { implicit z =>
       sqlite.sqlite3_complete(CUtils.toCString(sql)) != 0
     }
   }
@@ -197,7 +197,7 @@ object SQLite {
   def setDirectory(directoryType: Int, path: String): Unit = {
     assert(Platform.isWindows(), "setDirectory() is a windows specific method")
 
-    val rc = Zone { implicit z =>
+    val rc = Zone.acquire { implicit z =>
       sqlite_addons.sqlite3_win32_set_directory(directoryType, CUtils.toCString(path))
     }
 

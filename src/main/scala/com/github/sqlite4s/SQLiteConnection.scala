@@ -395,7 +395,7 @@ final class SQLiteConnection(val dbfile: File) extends Logging {
     if (canLogTrace) logger.trace(mkLogMessage(s"calling sqlite3_db_readonly [$dbName]"))
 
     val realDbName = dbName //if (dbName == null) "main" else dbName
-    val result = Zone { implicit z =>
+    val result = Zone.acquire { implicit z =>
       sqlite.sqlite3_db_readonly(handle(), CUtils.toCString(realDbName))
     }
 
@@ -1154,7 +1154,7 @@ final class SQLiteConnection(val dbfile: File) extends Logging {
     val sourceDb = handle()
     val destinationDb = destination.handle()
 
-    Zone { z =>
+    Zone.acquire { z =>
       val sourceDbNameAsCStr = CUtils.toCString(sourceDbName)(z)
       val backup = sqlite.sqlite3_backup_init(
         destinationDb,

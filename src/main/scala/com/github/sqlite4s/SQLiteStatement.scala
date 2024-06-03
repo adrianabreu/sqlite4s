@@ -558,7 +558,7 @@ final class SQLiteStatement private() extends Logging {
   def getBindParameterIndex(name: String): Int = {
     myController.validate()
 
-    Zone { implicit z =>
+    Zone.acquire { implicit z =>
       sqlite.sqlite3_bind_parameter_index(_getHandleOrFail(), CUtils.toCString(name))
     }
   }
@@ -698,7 +698,7 @@ final class SQLiteStatement private() extends Logging {
 
     // FIXME: check if it is better to use toCString or ByteArray raw conversion
     /*val valueLen = value.length
-      val valueAsCStr = Zone { implicit z =>
+      val valueAsCStr = Zone.acquire { implicit z =>
       toCString(value)
     }
     val valueAsBytes = value.getBytes()
