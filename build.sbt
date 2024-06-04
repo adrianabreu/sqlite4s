@@ -1,8 +1,8 @@
 name := "sqlite4s"
 organization := "com.github.david-bouyssie"
-version := "1.0.0"
+version := "0.6.0"
 scalaVersion := "3.3.3"
-crossScalaVersions := Seq("3.2.0", "3.1.2", "2.13.8", "2.12.14")
+crossScalaVersions := Seq("3.3.3", "2.13.14", "2.12.19")
 
 enablePlugins(ScalaNativePlugin)
 
