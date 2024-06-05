@@ -35,7 +35,7 @@ object CUtils {
   final val NULL_BYTE = 0.toByte //new java.lang.Character(0x0).charValue.toByte
   final val NULL_CHAR: CChar = NULL_BYTE
   final val ZERO_ASCII_CODE = 48
-  private val ZERO_CSIZE: CSize = 0L.toUSize
+  private val ZERO_CSIZE: CSize = 0L.toCSize
 
   def substr_idx(c_str: CString, c_sub_str: CString): Long = {
     val found_str = strstr(c_str, c_sub_str) // get the start pointer of substring
@@ -73,7 +73,7 @@ object CUtils {
     val arr = DoubleArray.alloc(len)
     val dst = arr.at(0).asInstanceOf[Ptr[Byte]]
     val src = doubles.asInstanceOf[Ptr[Byte]]
-    val size = sizeof[CDouble] * len.toUSize
+    val size = sizeof[CDouble] * len.toCSize
 
     libc.memcpy(dst, src, size)
 
